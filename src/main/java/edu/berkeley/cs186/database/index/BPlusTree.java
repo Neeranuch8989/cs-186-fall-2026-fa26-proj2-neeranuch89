@@ -257,20 +257,20 @@ public class BPlusTree {
         // Use the provided updateRoot() helper method to change
         // the tree's root if the old root splits.
         Optional<Pair<DataBox, Long>> split = root.put(key, rid);
-            if (split.isPresent()) {
-                DataBox upKey = split.get().getFirst();
-                long rightPageNum = split.get().getSecond();
+        if (split.isPresent()) {
+            DataBox upKey = split.get().getFirst();
+            long rightPageNum = split.get().getSecond();
 
-                BPlusNode newRoot = BPlusNode.fromBytes(metadata, bufferManager, lockContext, rightPageNum);
+            BPlusNode newRoot = BPlusNode.fromBytes(metadata, bufferManager, lockContext, rightPageNum);
 
-                List<DataBox> newKeys = new ArrayList<>();
-                newKeys.add(upKey);
-                List<Long> newChildren = new ArrayList<>();
-                newChildren.add(root.getPage().getPageNum());
-                newChildren.add(rightPageNum);
+            List<DataBox> newKeys = new ArrayList<>();
+            newKeys.add(upKey);
+            List<Long> newChildren = new ArrayList<>();
+            newChildren.add(root.getPage().getPageNum());
+            newChildren.add(rightPageNum);
 
-                updateRoot(new InnerNode(metadata, bufferManager, newKeys, newChildren, lockContext));
-            }
+            updateRoot(new InnerNode(metadata, bufferManager, newKeys, newChildren, lockContext));
+        }
     }
 
     /**
@@ -302,7 +302,7 @@ public class BPlusTree {
         // the tree's root if the old root splits.
 
         if (!(root instanceof LeafNode) || !((LeafNode) root).getKeys().isEmpty()) {
-            throw new BPlusTreeException("Cannot bulk load into a non-empty tree");
+            throw new BPlusTreeException("Cannot bulk load into a non-empty tree");//the tree is not empty at the time of bulkload
         }
 
         Optional<Pair<DataBox, Long>> split = root.bulkLoad(data, fillFactor);
@@ -471,12 +471,14 @@ public class BPlusTree {
                 current = next.get();
                 iter = current.scanAll();
             }
+
             return true;
         }
 
         @Override
         public RecordId next() {
             // TODO(proj2): implement
+            
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }

@@ -98,7 +98,7 @@ class InnerNode extends BPlusNode {
     @Override
     public Optional<Pair<DataBox, Long>> put(DataBox key, RecordId rid) {
         // TODO(proj2): implement
-    int index = InnerNode.numLessThanEqual(key, keys);
+        int index = InnerNode.numLessThanEqual(key, keys);
 
         Optional<Pair<DataBox, Long>> split = getChild(index).put(key, rid);
         if (!split.isPresent()) {
@@ -129,8 +129,8 @@ class InnerNode extends BPlusNode {
 
         InnerNode rightNode = new InnerNode(metadata, bufferManager, rightKeys, rightChildren, treeContext);
         long rightPageNum = rightNode.getPage().getPageNum();
-
         sync();
+
         return Optional.of(new Pair<>(upKey, rightPageNum));
     }
 
@@ -139,15 +139,13 @@ class InnerNode extends BPlusNode {
     public Optional<Pair<DataBox, Long>> bulkLoad(Iterator<Pair<DataBox, RecordId>> data,
             float fillFactor) {
         // TODO(proj2): implement
-        while (data.hasNext()) {
-            Optional<Pair<DataBox, Long>> split = getChild(children.size() - 1).bulkLoad(data, fillFactor);
+        while (data.hasNext()) {Optional<Pair<DataBox, Long>> split = getChild(children.size() - 1).bulkLoad(data, fillFactor);
 
             if (!split.isPresent()) {
                 break;}
 
             DataBox pushUpKey = split.get().getFirst();
             long newChildPageNum = split.get().getSecond();
-
             keys.add(pushUpKey);
             children.add(newChildPageNum);
 
@@ -158,11 +156,10 @@ class InnerNode extends BPlusNode {
                 List<DataBox> rightKeys = new ArrayList<>(keys.subList(mid + 1, keys.size()));
                 List<Long> rightChildren = new ArrayList<>(children.subList(mid + 1, children.size()));
 
-                keys.subList(mid, keys.size()).clear();        // removes mid key too
+                keys.subList(mid, keys.size()).clear();//removes mid key too
                 children.subList(mid + 1, children.size()).clear();
 
-                InnerNode rightNode = new InnerNode(metadata, bufferManager,
-                        rightKeys, rightChildren, treeContext);
+                InnerNode rightNode = new InnerNode(metadata, bufferManager, rightKeys, rightChildren, treeContext);
                 long rightPageNum = rightNode.getPage().getPageNum();
                 sync();
                 return Optional.of(new Pair<>(upKey, rightPageNum));
