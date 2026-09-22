@@ -305,22 +305,21 @@ public class BPlusTree {
             throw new BPlusTreeException("Cannot bulk load into a non-empty tree");
         }
 
-        while (data.hasNext()) {
-            Optional<Pair<DataBox, Long>> split = root.bulkLoad(data, fillFactor);
+        Optional<Pair<DataBox, Long>> split = root.bulkLoad(data, fillFactor);
 
-            if (split.isPresent()) {
-                DataBox upKey = split.get().getFirst();
-                long rightPageNum = split.get().getSecond();
+        if (split.isPresent()) {
+            DataBox upKey = split.get().getFirst();
+            long rightPageNum = split.get().getSecond();
 
-                List<DataBox> newKeys = new ArrayList<>();
-                newKeys.add(upKey);
-                List<Long> newChildren = new ArrayList<>();
-                newChildren.add(root.getPage().getPageNum());
-                newChildren.add(rightPageNum);
+            List<DataBox> newKeys = new ArrayList<>();
+            newKeys.add(upKey);
+            List<Long> newChildren = new ArrayList<>();
+            newChildren.add(root.getPage().getPageNum());
+            newChildren.add(rightPageNum);
 
-                updateRoot(new InnerNode(metadata, bufferManager, newKeys, newChildren, lockContext));
-            }
+            updateRoot(new InnerNode(metadata, bufferManager, newKeys, newChildren, lockContext));
         }
+
     }
 
     /**
